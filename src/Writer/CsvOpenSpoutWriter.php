@@ -15,9 +15,11 @@ use OpenSpout\Writer\Exception\WriterNotOpenedException;
 final class CsvOpenSpoutWriter implements DataWriterInterface
 {
     private bool $headerWritten = false;
-    private Writer $writer;
+    private readonly Writer $writer;
 
     /**
+     * @param array<int, string>|null $csvHeaders
+     *
      * @throws IOException
      */
     public function __construct(
@@ -43,11 +45,15 @@ final class CsvOpenSpoutWriter implements DataWriterInterface
     {
         foreach ($data as $row) {
             if (!$this->headerWritten) {
-                $this->writeHeader(null !== $this->csvHeaders ? $this->csvHeaders : array_keys($row));
+                $this->writeHeader($this->csvHeaders ?? array_keys($row));
                 $this->headerWritten = true;
             }
 
             $cells = [];
+
+            /**
+             * @var array<int, bool|\DateInterval|\DateTimeInterface|float|int|string|null> $row
+             */
             foreach ($row as $value) {
                 $cells[] = Cell::fromValue($value);
             }
@@ -59,6 +65,8 @@ final class CsvOpenSpoutWriter implements DataWriterInterface
     }
 
     /**
+     * @param array<int, string> $headers
+     *
      * @throws WriterNotOpenedException
      * @throws IOException
      */

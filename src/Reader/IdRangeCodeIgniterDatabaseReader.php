@@ -26,6 +26,9 @@ use CodeIgniter\Database\BaseConnection;
  * foreach ($reader->read() as $row) {
  *     echo $row['email'];
  * }
+ *
+ * @template TConnection
+ * @template TResult
  */
 final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
 {
@@ -36,6 +39,10 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
      */
     private $whereCallback;
 
+    /**
+     * @param list<string>                         $columns
+     * @param BaseConnection<TConnection, TResult> $db
+     */
     public function __construct(
         private readonly BaseConnection $db,
         private readonly string $table,
@@ -64,6 +71,10 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
             }
 
             $query = $builder->get();
+
+            if (false === $query) {
+                break;
+            }
 
             $rows = $query->getResultArray();
 
