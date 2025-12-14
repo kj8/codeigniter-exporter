@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class DataExportServiceTest extends TestCase
 {
-    public function testExport(): void
+    public function testItPassesReadDataToWriter(): void
     {
         $data = ['foo', 'bar'];
 

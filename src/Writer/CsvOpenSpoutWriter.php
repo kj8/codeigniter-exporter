@@ -18,13 +18,13 @@ final class CsvOpenSpoutWriter implements DataWriterInterface
     private readonly Writer $writer;
 
     /**
-     * @param array<int, string>|null $csvHeaders
+     * @param array<int, string>|null $documentHeaders
      *
      * @throws IOException
      */
     public function __construct(
         FileInfo $fileInfo,
-        private readonly ?array $csvHeaders = null,
+        private readonly ?array $documentHeaders = null,
         string $fieldDelimiter = ',',
         string $fieldEnclosure = '"',
     ) {
@@ -45,18 +45,14 @@ final class CsvOpenSpoutWriter implements DataWriterInterface
     {
         foreach ($data as $row) {
             if (!$this->headerWritten) {
-                $this->writeHeader($this->csvHeaders ?? array_keys($row));
+                $this->writeHeader($this->documentHeaders ?? array_keys($row));
                 $this->headerWritten = true;
             }
-
-            $cells = [];
 
             /**
              * @var array<int, bool|\DateInterval|\DateTimeInterface|float|int|string|null> $row
              */
-            foreach ($row as $value) {
-                $cells[] = Cell::fromValue($value);
-            }
+            $cells = array_map(fn($value) => Cell::fromValue($value), $row);
 
             $this->writer->addRow(new Row($cells));
         }
@@ -72,7 +68,7 @@ final class CsvOpenSpoutWriter implements DataWriterInterface
      */
     private function writeHeader(array $headers): void
     {
-        $cells = array_map(fn ($header) => Cell::fromValue($header), $headers);
+        $cells = array_map(fn($header) => Cell::fromValue($header), $headers);
         $this->writer->addRow(new Row($cells));
     }
 }

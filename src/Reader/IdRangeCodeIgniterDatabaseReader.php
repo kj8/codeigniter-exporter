@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kj8\CodeIgniterExporter\Reader;
 
-use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\Database\ConnectionInterface;
 
 /**
  * @example
@@ -40,11 +40,11 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
     private $whereCallback;
 
     /**
-     * @param list<string>                         $columns
-     * @param BaseConnection<TConnection, TResult> $db
+     * @param list<string>                              $columns
+     * @param ConnectionInterface<TConnection, TResult> $db
      */
     public function __construct(
-        private readonly BaseConnection $db,
+        private readonly ConnectionInterface $db,
         private readonly string $table,
         private readonly array $columns,
         ?callable $whereCallback = null,
