@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Kj8\CodeIgniterExporter\Reader;
+
+use CodeIgniter\Database\BaseConnection;
+
+/**
+ * @example
+ * $reader = new IdRangeCodeIgniterDatabaseReader(
+ *     db_connect(),
+ *     'users',
+ *     ['id', 'email', 'status', 'created_at'],
+ *     function (BaseBuilder $builder) {
+ *         $builder
+ *             ->where('status', 'active')
+ *             ->where('created_at >=', '2024-01-01')
+ *             ->whereIn('role', ['admin', 'editor'])
+ *             ->like('email', '@example.com');
+ *     },
+ *     5000,
+ *     'id'
+ * );
+ *
+ * foreach ($reader->read() as $row) {
+ *     echo $row['email'];
+ * }
+ */
+final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
+{
+    /**
+     * Callback function to apply additional WHERE conditions to the query builder.
+     *
+     * @var callable|null
+     */
+    private $whereCallback;
+
+    public function __construct(
+        private readonly BaseConnection $db,
+        private readonly string $table,
+        private readonly array $columns,
+        ?callable $whereCallback = null,
+        private readonly int $chunkSize = 500,
+        private readonly string $idColumn = 'id',
+    ) {
+        $this->whereCallback = $whereCallback;
+    }
+
+    public function read(): iterable
+    {
+        $lastId = 0;
+
+        while (true) {
+            $builder = $this->db
+                ->table($this->table)
+                ->select($this->columns)
+                ->where("$this->idColumn > ", $lastId)
+                ->orderBy($this->idColumn, 'ASC')
+                ->limit($this->chunkSize);
+
+            if (null !== $this->whereCallback) {
+                ($this->whereCallback)($builder);
+            }
+
+            $query = $builder->get();
+
+            $rows = $query->getResultArray();
+
+            if (!$rows) {
+                break;
+            }
+
+            foreach ($rows as $row) {
+                $lastId = $row[$this->idColumn];
+                yield $row;
+            }
+
+            $query->freeResult();
+            unset($rows);
+        }
+    }
+}
