@@ -6,14 +6,12 @@ namespace Kj8\CodeIgniterExporter\FileSystem;
 
 class FileInfo extends \SplFileInfo
 {
-    public function __construct(string $filename)
-    {
+    public function __construct(
+        string $filename,
+        DirectoryEnsurer $directoryEnsurer,
+    ) {
+        $directoryEnsurer->ensure(\dirname($filename));
+
         parent::__construct($filename);
-
-        $dir = $this->getPath();
-
-        if (!file_exists($dir)) {
-            mkdir($dir, 0o777, true);
-        }
     }
 }
