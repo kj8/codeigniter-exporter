@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Config\Database;
 use Kj8\CodeIgniterExporter\FileSystem\DirectoryEnsurer;
 use Kj8\CodeIgniterExporter\Reader\IdRangeCodeIgniterDatabaseReader;
+use Kj8\CodeIgniterExporter\Writer\Factory\WriterEntityFactory;
 use Kj8\CodeIgniterExporter\Writer\OpenSpoutFileWriter;
 use Kj8\CodeIgniterExporter\Writer\Options\CSVWriterOptions;
 use OpenSpout\Common\Exception\IOException;
@@ -32,10 +33,12 @@ class Demo extends BaseController
 
         (new DirectoryEnsurer())->ensure($filePath);
 
-        $writerOptions = new CSVWriterOptions();
-        $writer = new OpenSpoutFileWriter($filePath, $writerOptions);
+        $options = new CSVWriterOptions();
 
-        $writer->write($reader->read());
+        $writer = WriterEntityFactory::createCSVWriter($options);
+        $fileWriter = new OpenSpoutFileWriter($writer, $filePath);
+
+        $fileWriter->write($reader->read());
 
         return $this->response->setBody('CSV generated');
     }
