@@ -8,8 +8,10 @@ class DirectoryEnsurer
 {
     public function ensure(string $path): void
     {
-        if (!is_dir($path)) {
-            mkdir($path, 0o777, true);
+        $dir = dirname($path);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0o777, true);
         }
     }
 }

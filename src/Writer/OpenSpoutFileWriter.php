@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kj8\CodeIgniterExporter\Writer;
 
-use Kj8\CodeIgniterExporter\Common\CellCreator;
+use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Writer\AbstractWriter;
@@ -52,7 +52,7 @@ class OpenSpoutFileWriter implements DataWriterInterface
      */
     private function writeRow(array $row): void
     {
-        $this->writer->addRow(new Row(CellCreator::toCells($row)));
+        $this->writer->addRow(new Row($this->toCells($row)));
     }
 
     /**
@@ -66,5 +66,15 @@ class OpenSpoutFileWriter implements DataWriterInterface
     private function close(): void
     {
         $this->writer->close();
+    }
+
+    /**
+     * @param array<int, scalar|\DateTimeInterface|\DateInterval|null> $values
+     *
+     * @return array<int, Cell>
+     */
+    private function toCells(array $values): array
+    {
+        return array_map(static fn ($v) => Cell::fromValue($v), $values);
     }
 }
