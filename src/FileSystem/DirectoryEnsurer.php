@@ -8,7 +8,7 @@ class DirectoryEnsurer
 {
     public function ensure(string $path): void
     {
-        $dir = dirname($path);
+        $dir = \dirname($path);
 
         if (!is_dir($dir)) {
             mkdir($dir, 0o777, true);
