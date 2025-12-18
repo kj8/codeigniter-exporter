@@ -16,13 +16,14 @@ class OpenSpoutFileWriter implements DataWriterInterface
 
     /**
      * @param array<int, string>|null $documentHeaders
+     * @param array<int, string>|null $onlyFields
      */
     public function __construct(
         private readonly AbstractWriter $writer,
         private readonly string $filePath,
         private readonly ?array $documentHeaders = null,
-    ) {
-    }
+        private readonly ?array $onlyFields = null,
+    ) {}
 
     /**
      * @throws WriterNotOpenedException
@@ -33,6 +34,13 @@ class OpenSpoutFileWriter implements DataWriterInterface
         $this->open($this->filePath);
 
         foreach ($data as $row) {
+            if (null !== $this->onlyFields) {
+                $row = array_replace(
+                    array_flip($this->onlyFields),
+                    array_intersect_key($row, array_flip($this->onlyFields))
+                );
+            }
+
             if (!$this->headerWritten) {
                 $this->writeRow($this->documentHeaders ?? array_keys($row));
                 $this->headerWritten = true;
@@ -75,6 +83,6 @@ class OpenSpoutFileWriter implements DataWriterInterface
      */
     private function toCells(array $values): array
     {
-        return array_map(static fn ($v) => Cell::fromValue($v), $values);
+        return array_map(static fn($v) => Cell::fromValue($v), $values);
     }
 }
