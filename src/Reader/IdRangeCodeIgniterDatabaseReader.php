@@ -60,10 +60,10 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
 
         while (true) {
             $builder = $this->db
-                ->table($this->table)
+                ->table("$this->table AS table_")
                 ->select($this->columns)
-                ->where("$this->idColumn > ", $lastId)
-                ->orderBy($this->idColumn, 'ASC')
+                ->where("table_.$this->idColumn > ", $lastId)
+                ->orderBy("table_.$this->idColumn", 'ASC')
                 ->limit($this->chunkSize);
 
             if (null !== $this->whereCallback) {
@@ -81,7 +81,6 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
             if (!$rows) {
                 break;
             }
-
             foreach ($rows as $row) {
                 $lastId = $row[$this->idColumn];
                 yield $row;
