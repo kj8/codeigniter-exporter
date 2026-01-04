@@ -50,6 +50,7 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
         ?callable $whereCallback = null,
         private readonly int $chunkSize = 500,
         private readonly string $idColumn = 'id',
+        private readonly bool $useHavingInsteadOfWhereForLastId = false,
     ) {
         $this->whereCallback = $whereCallback;
     }
@@ -62,9 +63,14 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
             $builder = $this->db
                 ->table("$this->table AS table_")
                 ->select($this->columns)
-                ->where("$this->idColumn > ", $lastId)
                 ->orderBy("$this->idColumn", 'ASC')
                 ->limit($this->chunkSize);
+
+            if ($this->useHavingInsteadOfWhereForLastId) {
+                $builder = $builder->having("$this->idColumn > ", $lastId);
+            } else {
+                $builder = $builder->where("$this->idColumn > ", $lastId);
+            }
 
             if (null !== $this->whereCallback) {
                 ($this->whereCallback)($builder);
