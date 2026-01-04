@@ -23,7 +23,8 @@ class OpenSpoutFileWriter implements DataWriterInterface
         private readonly string $filePath,
         private readonly ?array $documentHeaders = null,
         private readonly ?array $onlyFields = null,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws WriterNotOpenedException
@@ -83,6 +84,6 @@ class OpenSpoutFileWriter implements DataWriterInterface
      */
     private function toCells(array $values): array
     {
-        return array_map(static fn($v) => Cell::fromValue($v), $values);
+        return array_map(static fn ($v) => Cell::fromValue($v), $values);
     }
 }

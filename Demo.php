@@ -14,7 +14,7 @@ use Kj8\CodeIgniterExporter\Writer\Options\CSVWriterOptions;
 use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Writer\Exception\WriterNotOpenedException;
 
-include __DIR__ . '/vendor/autoload.php';
+include __DIR__.'/vendor/autoload.php';
 
 class Demo extends BaseController
 {
@@ -30,7 +30,7 @@ class Demo extends BaseController
             ['id', 'email', 'created_at']
         );
 
-        $filePath = WRITEPATH . 'exports/users.csv';
+        $filePath = WRITEPATH.'exports/users.csv';
 
         (new DirectoryEnsurer())->ensure($filePath);
 
@@ -70,7 +70,7 @@ class Demo extends BaseController
                 ->groupBy('table_.created_by, table_.brand_id, table_.material_marketingowy, table_.wartosc_bonu, table_.rodzaj_nagrody');
         });
 
-        $filePath = WRITEPATH . 'exports/users.json';
+        $filePath = WRITEPATH.'exports/users.json';
 
         (new DirectoryEnsurer())->ensure($filePath);
 
@@ -89,7 +89,7 @@ class Demo extends BaseController
         $columns = [
             'GROUP_CONCAT(table_.id) AS wszystkie_id',
             '"specjalne" AS symbol',
-            'CONCAT("' . $orderLabel . '", "_", ROW_NUMBER() OVER (ORDER BY table_.id ASC)) AS nr_zamowienia',
+            'CONCAT("'.$orderLabel.'", "_", ROW_NUMBER() OVER (ORDER BY table_.id ASC)) AS nr_zamowienia',
             '"" AS data_zamowienia',
             'table_.id AS id',
             'table_.created_by',
@@ -105,7 +105,7 @@ class Demo extends BaseController
             'brands.name AS brand_name',
         ];
 
-        $reader = new IdRangeCodeIgniterDatabaseReader($this->db, 'orders_items', $columns, function (BaseBuilder $builder) {
+        $reader = new IdRangeCodeIgniterDatabaseReader($this->db, 'orders_items', $columns, function (BaseBuilder $builder): void {
             $builder
                 ->join('users', 'users.id = table_.created_by')
                 ->join('brands', 'brands.id = table_.brand_id')
@@ -113,7 +113,7 @@ class Demo extends BaseController
                 ->groupBy('table_.created_by, table_.brand_id, table_.material_marketingowy, table_.wartosc_bonu, table_.rodzaj_nagrody');
         });
 
-        $filePath = WRITEPATH . "exports/$filename.csv";
+        $filePath = WRITEPATH."exports/$filename.csv";
 
         (new DirectoryEnsurer())->ensure($filePath);
 
@@ -129,8 +129,9 @@ class Demo extends BaseController
 
         try {
             $fileWriter->write($reader->read());
+
             return $filePath;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
