@@ -88,7 +88,8 @@ final class IdRangeCodeIgniterDatabaseReader implements DataReaderInterface
                 break;
             }
             foreach ($rows as $row) {
-                $lastId = $row[$this->idColumn];
+                $key = preg_replace('/^.*\./', '', $this->idColumn);
+                $lastId = $row[$key];
                 yield $row;
             }
 
